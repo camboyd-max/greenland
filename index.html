@@ -1,107 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Landslide Map</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    .map-container {
-      position: relative;
-      display: inline-block;
-      width: 800px;
-      margin: 20px auto;
-    }
-    .map-container img {
-      width: 100%;
-      height: auto;
-    }
-    .marker {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background-color: blue;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
-      cursor: pointer;
-      text-indent: -9999px;
-    }
-    .marker:hover {
-      background-color: red;
-    }
-    .details {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .details h2 {
-      margin-top: 0;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Landslide Map with Popups</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 20px;
+  }
+  .map-container {
+    position: relative;
+    width: 800px;
+    margin: 0 auto;
+  }
+  .map-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+  }
+  /* Modal background */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Sit on top of everything */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+  }
+  /* Modal content box */
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: left;
+  }
+  /* Close button */
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+  }
+  .close-btn:hover {
+    color: black;
+  }
+</style>
 </head>
 <body>
 
-  <h1>Interactive Landslide Map - Disko Bugt Region</h1>
+<h1>Interactive Landslide Map - Disko Bugt Region</h1>
 
-  <div class="map-container">
-    <img src="diskoBay.png" alt="Disko Bugt Map">
+<div class="map-container">
+  <img src="https://www.researchgate.net/profile/Ole-Bennike/publication/282736999/figure/fig1/AS:669962876248074@1536743005914/Map-of-the-Disko-Bugt-region-showing-the-localities-named-in-the-text-The-stippled-line.png" alt="Disko Bugt Map">
 
-    <!-- Karrat Fjord (2017) -->
-    <a href="#karrat2017" class="marker" title="2017 Karrat Fjord Landslide-Tsunami"
-       style="top: 130px; left: 480px;">●</a>
+  <!-- Markers with data-popup-id to link to modal -->
+  <div class="marker" style="top:130px; left:480px;" data-popup-id="popup-karrat" title="2017 Karrat Fjord Landslide-Tsunami"></div>
+  <div class="marker" style="top:210px; left:420px;" data-popup-id="popup-niiortuut" title="1952 Niiortuut Landslide-Tsunami"></div>
+  <div class="marker" style="top:260px; left:400px;" data-popup-id="popup-paatuut1996" title="1996 Paatuut Landslide"></div>
+  <div class="marker" style="top:280px; left:400px;" data-popup-id="popup-paatuut2000" title="2000 Paatuut Landslide"></div>
+  <div class="marker" style="top:150px; left:520px;" data-popup-id="popup-assapaat" title="2021 Assapaat Landslide"></div>
+</div>
 
-    <!-- Niiortuut (1952) -->
-    <a href="#niiortuut1952" class="marker" title="1952 Niiortuut Landslide-Tsunami"
-       style="top: 210px; left: 420px;">●</a>
-
-    <!-- Paatuut (1996) -->
-    <a href="#paatuut1996" class="marker" title="1996 Paatuut Landslide"
-       style="top: 260px; left: 400px;">●</a>
-
-    <!-- Paatuut (2000) -->
-    <a href="#paatuut2000" class="marker" title="2000 Paatuut Landslide"
-       style="top: 280px; left: 400px;">●</a>
-
-    <!-- Assapaat (2021) -->
-    <a href="#assapaat2021" class="marker" title="2021 Assapaat Landslide"
-       style="top: 150px; left: 520px;">●</a>
-  </div>
-
-  <div class="details" id="karrat2017">
+<!-- Popups -->
+<div id="popup-karrat" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
     <h2>2017 Karrat Fjord Landslide-Tsunami</h2>
-    <p>Details about the 2017 Karrat Fjord landslide-tsunami...</p>
+    <p>The 2017 Karrat Fjord landslide caused a significant tsunami in the region, with large-scale impacts on the local environment and communities.</p>
   </div>
+</div>
 
-  <div class="details" id="niiortuut1952">
+<div id="popup-niiortuut" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
     <h2>1952 Niiortuut Landslide-Tsunami</h2>
-    <p>Details about the 1952 Niiortuut landslide-tsunami...</p>
+    <p>The 1952 Niiortuut landslide triggered a tsunami that affected coastal settlements in the Disko Bugt region.</p>
   </div>
+</div>
 
-  <div class="details" id="paatuut1996">
+<div id="popup-paatuut1996" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
     <h2>1996 Paatuut Landslide</h2>
-    <p>Details about the 1996 Paatuut landslide...</p>
+    <p>In 1996, the Paatuut landslide occurred, altering the local landscape and causing geological changes.</p>
   </div>
+</div>
 
-  <div class="details" id="paatuut2000">
+<div id="popup-paatuut2000" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
     <h2>2000 Paatuut Landslide</h2>
-    <p>Details about the 2000 Paatuut landslide...</p>
+    <p>The 2000 Paatuut landslide was another significant event in the area, with notable geological consequences.</p>
   </div>
+</div>
 
-  <div class="details" id="assapaat2021">
+<div id="popup-assapaat" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
     <h2>2021 Assapaat Landslide</h2>
-    <p>Details about the 2021 Assapaat landslide...</p>
+    <p>The 2021 Assapaat landslide is the most recent event, with ongoing studies to understand its full impact.</p>
   </div>
+</div>
+
+<script>
+  // Get all markers
+  const markers = document.querySelectorAll('.marker');
+  // Get all modals
+  const modals = document.querySelectorAll('.modal');
+  // Get all close buttons
+  const closeButtons = document.querySelectorAll('.close-btn');
+
+  markers.forEach(marker => {
+    marker.addEventListener('click', () => {
+      const popupId = marker.getAttribute('data-popup-id');
+      if (!popupId) return;
+      const popup = document.getElementById(popupId);
+      if (popup) {
+        popup.style.display = 'block';
+      }
+    });
+  });
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.modal').style.display = 'none';
+    });
+  });
+
+  // Close modal if user clicks outside modal content
+  window.addEventListener('click', e => {
+    modals.forEach(modal => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
+
 
